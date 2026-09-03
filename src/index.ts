@@ -117,7 +117,7 @@ export default (async ({ client, directory }, options) => {
     tool: {
       view_image: tool({
         description:
-          "Inspect an image using the multimodal vision model. The current coding model cannot see images. Use this tool EVERY time a message includes a pasted or attached image (screenshot, photo, diagram, chart, UI capture) and the answer requires seeing its content: reading text inside it, describing layout, colors, or visual state. You may call it repeatedly, e.g. to ask follow-up questions about the same image. NEVER tell the user to save an image to a file or provide a path; the session's images are directly accessible to this tool. Returns the vision model's textual answer. Optionally pass a file path; without one, the most recent image in this session is inspected.",
+          "Inspect an image using the multimodal vision model. The current coding model cannot see images. Use this tool EVERY time a message includes a pasted or attached image (screenshot, photo, diagram, chart, UI capture) and the answer requires seeing its content: reading text inside it, describing layout, colors, or visual state. This includes messages where an image part was replaced by a notice or error saying the model does not support image input: that notice means an image IS attached and this tool can still inspect it. You may call this tool repeatedly, e.g. to ask follow-up questions about the same image. NEVER tell the user to save an image to a file or provide a path; the session's images are directly accessible to this tool. Returns the vision model's textual answer. Optionally pass a file path; without one, the most recent image in this session is inspected.",
         args: {
           question: tool.schema
             .string()

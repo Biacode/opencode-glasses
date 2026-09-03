@@ -18,22 +18,24 @@ The tool finds the image on its own: it uses the most recent image in the curren
 
 This works whether or not your provider errors on images sent to text-only models. GLM coding plan, for example, does not error: `glm-5.3` just answers blind, so there is no failure event for a fallback plugin to catch. A tool call works because the model itself decides to use it.
 
+When a blind model receives an image, opencode typically replaces the image part with a notice like "model does not support image input". The tool description tells your model explicitly that such a notice means an image IS attached and `view_image` can inspect it, so the first pass does not dead-end in "I can't see images".
+
 ## Install
+
+Pin the version. opencode caches installed plugins under `~/.cache/opencode/packages/` and does not always pick up new releases on its own, so an unpinned entry can leave you stuck on an old copy without any error.
 
 ```jsonc
 // opencode.json (or ~/.config/opencode/opencode.json)
 {
   "plugin": [
-    ["opencode-glasses", { "model": "zai-coding-plan/glm-5.3-flash", "variant": "max" }]
+    ["opencode-glasses@0.1.2", { "model": "zai-coding-plan/glm-5.3-flash", "variant": "max" }]
   ]
 }
 ```
 
-Restart opencode. That is the whole setup: the plugin installs the agent and the tool for you.
+Restart opencode. That is the whole setup: the plugin installs the agent and the tool for you. To upgrade later, bump the pinned version and restart. If a pinned release still does not show up, delete `~/.cache/opencode/packages/opencode-glasses*` and restart.
 
-Note for upgrades: opencode caches installed plugins under `~/.cache/opencode/packages/` and does not always pick up a new version immediately. If a release is not showing up, delete `~/.cache/opencode/packages/opencode-glasses*` and restart, or pin an exact version in the plugin entry (`"opencode-glasses@0.1.1"`).
-
-Before the first npm publish, install straight from GitHub:
+To run the latest commit straight from GitHub instead of npm:
 
 ```jsonc
 {

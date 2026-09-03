@@ -1,6 +1,6 @@
 {
   "name": "opencode-glasses",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Give a text-only coding model eyes: a view_image tool that delegates image inspection to any multimodal model you configure",
   "license": "MIT",
   "type": "module",
