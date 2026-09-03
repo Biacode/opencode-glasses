@@ -16,6 +16,17 @@
     "images",
     "llm"
   ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Biacode/opencode-glasses.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Biacode/opencode-glasses/issues"
+  },
+  "homepage": "https://github.com/Biacode/opencode-glasses#readme",
+  "files": [
+    "src"
+  ],
   "peerDependencies": {
     "@opencode-ai/plugin": "*"
   },
