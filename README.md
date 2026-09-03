@@ -31,6 +31,8 @@ This works whether or not your provider errors on images sent to text-only model
 
 Restart opencode. That is the whole setup: the plugin installs the agent and the tool for you.
 
+Note for upgrades: opencode caches installed plugins under `~/.cache/opencode/packages/` and does not always pick up a new version immediately. If a release is not showing up, delete `~/.cache/opencode/packages/opencode-glasses*` and restart, or pin an exact version in the plugin entry (`"opencode-glasses@0.1.1"`).
+
 Before the first npm publish, install straight from GitHub:
 
 ```jsonc
