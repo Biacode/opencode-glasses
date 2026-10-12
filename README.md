@@ -10,7 +10,7 @@ Typical pairing: a strong text-only coding model as default plus a cheap multimo
 
 ## How it works
 
-1. On startup the plugin injects a `vision` agent configured with your vision model, and registers the `view_image` tool for every agent.
+1. The plugin registers a `view_image` tool for every agent. The vision model is configured on a `vision` agent in your `opencode.json` (OpenCode 2). On OpenCode 1 the plugin injects the agent for you from its options.
 2. When the model calls `view_image`, the plugin starts a throwaway session on the `vision` agent, sends it the image plus the question, and waits for the answer.
 3. The answer returns as tool output and the throwaway session is deleted.
 
@@ -22,30 +22,65 @@ When a blind model receives an image, opencode typically replaces the image part
 
 ## Install
 
-Pin the version. opencode caches installed plugins under `~/.cache/opencode/packages/` and does not always pick up new releases on its own, so an unpinned entry can leave you stuck on an old copy without any error.
+### OpenCode 2
+
+Define the `vision` agent with your multimodal model, then add the plugin:
 
 ```jsonc
 // opencode.json (or ~/.config/opencode/opencode.json)
 {
-  "plugin": [
-    ["opencode-glasses@0.1.2", { "model": "zai-coding-plan/glm-5.3-flash", "variant": "max" }]
+  "agent": {
+    "vision": {
+      "mode": "all",
+      "model": "zai-coding-plan/glm-5.3-flash",
+      "variant": "max",
+      "description": "Vision specialist for images",
+      "prompt": "Answer questions about images tersely and factually based only on what is visible."
+    }
+  },
+  "plugins": [
+    { "package": "opencode-glasses@0.2.0", "options": { "agent": "vision" } }
   ]
 }
 ```
 
-Restart opencode. That is the whole setup: the plugin installs the agent and the tool for you. To upgrade later, bump the pinned version and restart. If a pinned release still does not show up, delete `~/.cache/opencode/packages/opencode-glasses*` and restart.
+Restart opencode. To upgrade later, bump the pinned version and restart. If a pinned release still does not show up, delete `~/.cache/opencode/packages/opencode-glasses*` and restart.
 
-To run the latest commit straight from GitHub instead of npm:
+### OpenCode 1 (1.18.29 or newer)
+
+The plugin injects the `vision` agent for you; only the plugin entry and the model are needed:
 
 ```jsonc
 {
   "plugin": [
-    ["opencode-glasses@git+https://github.com/Biacode/opencode-glasses", { "model": "zai-coding-plan/glm-5.3-flash" }]
+    ["opencode-glasses@0.2.0", { "model": "zai-coding-plan/glm-5.3-flash", "variant": "max" }]
   ]
 }
 ```
 
+To run the latest commit straight from GitHub instead of npm (works on both majors):
+
+```jsonc
+// OpenCode 2
+{ "plugins": [{ "package": "opencode-glasses@git+https://github.com/Biacode/opencode-glasses.git", "options": { "agent": "vision" } }] }
+
+// OpenCode 1
+{ "plugin": [["opencode-glasses@git+https://github.com/Biacode/opencode-glasses.git", { "model": "zai-coding-plan/glm-5.3-flash" }]] }
+```
+
 ## Configuration
+
+### OpenCode 2
+
+| Option | Required | Default | Meaning |
+|---|---|---|---|
+| `agent` | no | `vision` | Name of the agent (defined in your `agent` config) that runs the vision model. |
+
+The vision model itself is configured on that agent, not in the plugin options. Env var equivalent: `OPENCODE_GLASSES_AGENT`.
+
+If you already have an agent named `vision`, the tool delegates to yours — no separate config needed beyond the plugin entry.
+
+### OpenCode 1
 
 | Option | Required | Default | Meaning |
 |---|---|---|---|
@@ -53,11 +88,9 @@ To run the latest commit straight from GitHub instead of npm:
 | `variant` | no | | Model variant, e.g. `max` on GLM reasoning models. |
 | `agent` | no | `vision` | Name of the injected agent. Change it if you already have your own `vision` agent. |
 
-Instead of options you can set environment variables: `OPENCODE_GLASSES_MODEL`, `OPENCODE_GLASSES_VARIANT`, `OPENCODE_GLASSES_AGENT`. Options win over env vars.
+Env vars: `OPENCODE_GLASSES_MODEL`, `OPENCODE_GLASSES_VARIANT`, `OPENCODE_GLASSES_AGENT`. Options win over env vars.
 
 To find a vision model on your setup, run `opencode models <provider> --verbose` and look for `"attachment": true` in the model metadata.
-
-If you already have an agent named `vision`, the plugin does not touch it and the tool delegates to yours. That is the escape hatch for full control over the vision agent's prompt or permissions.
 
 ## The image paste gotcha
 
@@ -83,7 +116,13 @@ bun test
 bun run typecheck
 ```
 
-To try local changes without publishing, point your `plugin` entry at the source file inside your checkout (the file, not the repo folder; directory paths currently fail to load silently):
+To try local changes without publishing, symlink the entry file into the auto-discovered config plugins directory (verified on OpenCode 2.0.x; `plugins` entries pointing at plain directories or files are ignored or rejected):
+
+```sh
+ln -sf /absolute/path/to/opencode-glasses/src/index.ts ~/.config/opencode/plugins/glasses.ts
+```
+
+The repo also ships `.opencode/plugins/index.ts`, which re-exports the same definition for directory-based discovery where that is supported. On OpenCode 1, point the `plugin` entry at the entry file directly:
 
 ```jsonc
 { "plugin": [["/absolute/path/to/opencode-glasses/src/index.ts", { "model": "..." }]] }

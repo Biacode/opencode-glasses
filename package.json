@@ -1,6 +1,6 @@
 {
   "name": "opencode-glasses",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Give a text-only coding model eyes: a view_image tool that delegates image inspection to any multimodal model you configure",
   "license": "MIT",
   "type": "module",
@@ -25,15 +25,20 @@
     "src"
   ],
   "peerDependencies": {
-    "@opencode-ai/plugin": "*"
+    "@opencode-ai/plugin": "*",
+    "@opencode/plugin": "*"
   },
   "devDependencies": {
     "@opencode-ai/plugin": "latest",
+    "@opencode/plugin": "latest",
     "@types/bun": "latest",
     "typescript": "latest"
   },
   "scripts": {
     "test": "bun test",
     "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@opencode/plugin": "^2.0.27"
   }
 }
